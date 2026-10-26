@@ -1,0 +1,17 @@
+{
+  "name": "descargar-planilla",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Descargar una Google Sheet como Excel",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "googleapis": "^144.0.0"
+  }
+}

@@ -1,0 +1,122 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Descargar planilla</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background: #f4f6fa;
+      color: #172033;
+    }
+
+    main {
+      width: 100%;
+      max-width: 400px;
+      padding: 36px 28px;
+      text-align: center;
+      background: white;
+      border: 1px solid #e1e5ec;
+      border-radius: 18px;
+      box-shadow: 0 12px 35px #17203312;
+    }
+
+    .icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      font-size: 25px;
+      margin: 0 0 12px;
+    }
+
+    p {
+      color: #657086;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      border: 0;
+      border-radius: 10px;
+      background: #1769e0;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover { background: #1056bd; }
+    button:disabled { opacity: .6; cursor: wait; }
+
+    #status {
+      min-height: 20px;
+      margin: 16px 0 0;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="icon" aria-hidden="true">📊</div>
+    <h1>Descargar planilla</h1>
+    <p>Descargá la planilla actualizada en formato Excel.</p>
+
+    <button id="download" type="button">
+      ↓ Descargar Excel
+    </button>
+
+    <p id="status" role="status" aria-live="polite"></p>
+  </main>
+
+  <script>
+    const button = document.getElementById("download");
+    const status = document.getElementById("status");
+
+    button.addEventListener("click", async () => {
+      button.disabled = true;
+      status.textContent = "Preparando el Excel...";
+
+      try {
+        const response = await fetch("/api/descargar");
+
+        if (!response.ok) {
+          const data = await response.json().catch(() => ({}));
+          throw new Error(
+            data.error || "No se pudo descargar la planilla."
+          );
+        }
+
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+
+        link.href = url;
+        link.download = "planilla.xlsx";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        status.textContent = "¡Descarga iniciada!";
+      } catch (error) {
+        status.textContent = error.message;
+      } finally {
+        button.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
